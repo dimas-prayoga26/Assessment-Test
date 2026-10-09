@@ -28,7 +28,7 @@ class AssessmentFileController extends Controller
             return Storage::disk($disk)->response($filePath, $fileName, $headers);
         }
 
-        foreach ([public_path($filePath), base_path($filePath)] as $publicFilePath) {
+        foreach ($this->possiblePublicFilePaths($filePath) as $publicFilePath) {
             if (File::exists($publicFilePath)) {
                 return response()->file($publicFilePath, $headers);
             }
@@ -50,5 +50,19 @@ class AssessmentFileController extends Controller
         );
 
         return $filePath;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function possiblePublicFilePaths(string $filePath): array
+    {
+        return array_values(array_unique([
+            public_path($filePath),
+            base_path($filePath),
+            dirname(public_path()).DIRECTORY_SEPARATOR.$filePath,
+            dirname(base_path()).DIRECTORY_SEPARATOR.$filePath,
+            storage_path('app/public/'.$filePath),
+        ]));
     }
 }

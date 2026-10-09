@@ -141,8 +141,8 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringContainsString('brandKeyForHost', $access);
         $this->assertStringContainsString("config('assessment_upload.connection'", $access);
         $this->assertStringContainsString("config('assessment_upload.host_brands', [])", $access);
-        $this->assertStringContainsString("'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', 'assessment_upload')", $assessmentConfig);
-        $this->assertStringContainsString("'assessment_upload' => [", $databaseConfig);
+        $this->assertStringContainsString("'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', env('DB_CONNECTION', 'mysql'))", $assessmentConfig);
+        $this->assertStringNotContainsString("'assessment_upload' => [", $databaseConfig);
         $this->assertStringContainsString('storeAssessmentDocument', $access);
         $this->assertStringContainsString('assessmentDocumentForRequest', $access);
         $this->assertStringContainsString('applicant_upload_requests', $access);
@@ -152,5 +152,33 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringContainsString('Storage::disk($disk)->response', $assessmentFileController);
         $this->assertStringContainsString('$formAction', $verifyView);
         $this->assertStringContainsString('$formAction', $uploadView);
+    }
+
+    public function test_assessment_test_contract_matches_andalan_migration_project(): void
+    {
+        $andalanProjectPath = base_path('..'.DIRECTORY_SEPARATOR.'andalan-migration');
+
+        if (! File::isDirectory($andalanProjectPath)) {
+            $this->markTestSkipped('andalan-migration project is not available beside Hasil-Assessment-Test.');
+        }
+
+        $routes = File::get(base_path('routes/web.php'));
+        $access = File::get(app_path('Support/AssessmentUploadAccess.php'));
+        $andalanService = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'Services'.DIRECTORY_SEPARATOR.'ApplicantAssessmentUploadLinkService.php');
+        $andalanDocumentModel = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'Models'.DIRECTORY_SEPARATOR.'ApplicantDocument.php');
+        $andalanAssessmentConfig = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'assessment_upload.php');
+        $andalanAssessmentView = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.'applicant_data'.DIRECTORY_SEPARATOR.'assessment.blade.php');
+
+        $this->assertStringContainsString('/{applicant}/upload-file/verify-applicant', $routes);
+        $this->assertStringContainsString('/{applicant}/assessment-file', $routes);
+        $this->assertStringContainsString("config('assessment_upload.document_type', 'assessment_test')", $access);
+        $this->assertStringContainsString("config('assessment_upload.connection'", $access);
+        $this->assertStringNotContainsString('brand_connections', $access);
+
+        $this->assertStringContainsString('/upload-file/verify-applicant', $andalanService);
+        $this->assertStringContainsString('/assessment-file', $andalanService);
+        $this->assertStringContainsString("public const TYPE_ASSESSMENT_TEST = 'assessment_test';", $andalanDocumentModel);
+        $this->assertStringContainsString("'trah' => 'https://technical-test.trah.co.id'", $andalanAssessmentConfig);
+        $this->assertStringContainsString('assessmentFileUrl', $andalanAssessmentView);
     }
 }

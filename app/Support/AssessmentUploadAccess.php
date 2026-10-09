@@ -26,11 +26,11 @@ class AssessmentUploadAccess
 
         abort_if($brandKey === null, 404);
 
-        $applicant = $this->applicantRecord($applicantId, $brandKey);
+        $applicant = $this->applicantRecord($applicantId);
 
         abort_if($applicant === null, 404);
         abort_unless($this->brandMatchesApplicant($brandKey, $applicant), 404);
-        abort_if($this->activeUploadRequest($applicantId, $brandKey) === null, 404);
+        abort_if($this->activeUploadRequest($applicantId) === null, 404);
 
         return $applicant;
     }
@@ -86,7 +86,7 @@ class AssessmentUploadAccess
         abort_if($brandKey === null, 404);
 
         $connection = $this->connection();
-        $uploadRequest = $this->activeUploadRequest($applicantId, $brandKey);
+        $uploadRequest = $this->activeUploadRequest($applicantId);
 
         abort_if($uploadRequest === null, 404);
 
@@ -141,7 +141,7 @@ class AssessmentUploadAccess
 
         abort_if($brandKey === null, 404);
 
-        $applicant = $this->applicantRecord($applicantId, $brandKey);
+        $applicant = $this->applicantRecord($applicantId);
 
         abort_if($applicant === null, 404);
         abort_unless($this->brandMatchesApplicant($brandKey, $applicant), 404);
@@ -159,7 +159,7 @@ class AssessmentUploadAccess
         return $document;
     }
 
-    private function applicantRecord(string $applicantId, string $brandKey): ?object
+    private function applicantRecord(string $applicantId): ?object
     {
         return $this->connection()
             ->table(self::APPLICANTS_TABLE)
@@ -169,7 +169,7 @@ class AssessmentUploadAccess
             ->first();
     }
 
-    private function activeUploadRequest(string $applicantId, string $brandKey): ?object
+    private function activeUploadRequest(string $applicantId): ?object
     {
         return $this->connection()
             ->table(self::UPLOAD_REQUESTS_TABLE)

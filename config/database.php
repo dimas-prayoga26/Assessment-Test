@@ -64,26 +64,6 @@ return [
             ]) : [],
         ],
 
-        'assessment_upload' => [
-            'driver' => env('ASSESSMENT_UPLOAD_DB_DRIVER', 'mysql'),
-            'url' => env('ASSESSMENT_UPLOAD_DB_URL'),
-            'host' => env('ASSESSMENT_UPLOAD_DB_HOST', env('DB_HOST', '127.0.0.1')),
-            'port' => env('ASSESSMENT_UPLOAD_DB_PORT', env('DB_PORT', '3306')),
-            'database' => env('ASSESSMENT_UPLOAD_DB_DATABASE', env('DB_DATABASE', 'laravel')),
-            'username' => env('ASSESSMENT_UPLOAD_DB_USERNAME', env('DB_USERNAME', 'root')),
-            'password' => env('ASSESSMENT_UPLOAD_DB_PASSWORD', env('DB_PASSWORD', '')),
-            'unix_socket' => env('ASSESSMENT_UPLOAD_DB_SOCKET', env('DB_SOCKET', '')),
-            'charset' => env('ASSESSMENT_UPLOAD_DB_CHARSET', env('DB_CHARSET', 'utf8mb4')),
-            'collation' => env('ASSESSMENT_UPLOAD_DB_COLLATION', env('DB_COLLATION', 'utf8mb4_unicode_ci')),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('ASSESSMENT_UPLOAD_MYSQL_ATTR_SSL_CA', env('MYSQL_ATTR_SSL_CA')),
-            ]) : [],
-        ],
-
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
