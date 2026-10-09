@@ -28,11 +28,13 @@ class AssessmentFileController extends Controller
             return Storage::disk($disk)->response($filePath, $fileName, $headers);
         }
 
-        $publicFilePath = public_path($filePath);
+        foreach ([public_path($filePath), base_path($filePath)] as $publicFilePath) {
+            if (File::exists($publicFilePath)) {
+                return response()->file($publicFilePath, $headers);
+            }
+        }
 
-        abort_unless(File::exists($publicFilePath), 404);
-
-        return response()->file($publicFilePath, $headers);
+        abort(404);
     }
 
     private function safeRelativePath(string $filePath): string

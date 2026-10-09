@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Support\AssessmentUploadAccess;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -48,6 +49,34 @@ class AssessmentFileTest extends TestCase
         $response = $this->get($this->assessmentFileRoute());
 
         $response->assertNotFound();
+    }
+
+    public function test_uploaded_assessment_image_can_be_served_from_project_root_upload_directory(): void
+    {
+        Storage::fake('public');
+
+        $filePath = base_path('uploaded-images/base-path-result.jpg');
+        File::ensureDirectoryExists(dirname($filePath));
+        File::put($filePath, 'image-content');
+
+        $this->mock(AssessmentUploadAccess::class, function ($mock): void {
+            $mock->shouldReceive('assessmentDocumentForRequest')
+                ->once()
+                ->andReturn((object) [
+                    'file_path' => 'uploaded-images/base-path-result.jpg',
+                    'original_name' => 'base-path-result.jpg',
+                    'mime_type' => 'image/jpeg',
+                ]);
+        });
+
+        try {
+            $response = $this->get($this->assessmentFileRoute());
+
+            $response->assertOk();
+            $this->assertSame('image/jpeg', $response->headers->get('content-type'));
+        } finally {
+            File::delete($filePath);
+        }
     }
 
     public function test_unsafe_assessment_image_path_returns_not_found(): void

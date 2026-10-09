@@ -125,6 +125,8 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $uploadPostRoute = Route::getRoutes()->getByName('upload-files.generated.store');
         $assessmentFileRoute = Route::getRoutes()->getByName('assessment-files.show');
         $access = File::get(app_path('Support/AssessmentUploadAccess.php'));
+        $assessmentConfig = File::get(config_path('assessment_upload.php'));
+        $databaseConfig = File::get(config_path('database.php'));
         $verificationController = File::get(app_path('Http/Controllers/UploadFileVerificationController.php'));
         $uploadController = File::get(app_path('Http/Controllers/UploadFileController.php'));
         $assessmentFileController = File::get(app_path('Http/Controllers/AssessmentFileController.php'));
@@ -139,6 +141,8 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringContainsString('brandKeyForHost', $access);
         $this->assertStringContainsString("config('assessment_upload.connection'", $access);
         $this->assertStringContainsString("config('assessment_upload.host_brands', [])", $access);
+        $this->assertStringContainsString("'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', 'assessment_upload')", $assessmentConfig);
+        $this->assertStringContainsString("'assessment_upload' => [", $databaseConfig);
         $this->assertStringContainsString('storeAssessmentDocument', $access);
         $this->assertStringContainsString('assessmentDocumentForRequest', $access);
         $this->assertStringContainsString('applicant_upload_requests', $access);

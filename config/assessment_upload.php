@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', env('DB_CONNECTION', 'mysql')),
+    'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', 'assessment_upload'),
 
     'default_brand' => 'rnb',
 
