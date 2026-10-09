@@ -29,13 +29,10 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertSame('0812 3456 ****', $access->maskedPhone($applicant));
     }
 
-    public function test_applicant_lookup_uses_connection_for_request_domain(): void
+    public function test_applicant_lookup_uses_configured_connection_for_request_domain(): void
     {
         config([
-            'assessment_upload.brand_connections' => [
-                'rnb' => 'assessment_rnb',
-                'trah' => 'assessment_trah',
-            ],
+            'assessment_upload.connection' => 'assessment',
             'assessment_upload.host_brands' => [
                 'technical-test.rnb.co.id' => 'rnb',
                 'technical-test.trah.co.id' => 'trah',
@@ -48,7 +45,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
 
         DB::shouldReceive('connection')
             ->twice()
-            ->with('assessment_trah')
+            ->with('assessment')
             ->andReturn($connection);
 
         $connection->shouldReceive('table')
@@ -126,9 +123,11 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $verifyPostRoute = Route::getRoutes()->getByName('upload-files.verify.applicant.generated.check');
         $uploadRoute = Route::getRoutes()->getByName('upload-files.generated.create');
         $uploadPostRoute = Route::getRoutes()->getByName('upload-files.generated.store');
+        $assessmentFileRoute = Route::getRoutes()->getByName('assessment-files.show');
         $access = File::get(app_path('Support/AssessmentUploadAccess.php'));
         $verificationController = File::get(app_path('Http/Controllers/UploadFileVerificationController.php'));
         $uploadController = File::get(app_path('Http/Controllers/UploadFileController.php'));
+        $assessmentFileController = File::get(app_path('Http/Controllers/AssessmentFileController.php'));
         $verifyView = File::get(resource_path('views/upload-files/verify-applicant.blade.php'));
         $uploadView = File::get(resource_path('views/upload-files/create.blade.php'));
 
@@ -136,14 +135,17 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertSame('{applicant}/upload-file/verify-applicant', $verifyPostRoute?->uri());
         $this->assertSame('{applicant}/upload-file', $uploadRoute?->uri());
         $this->assertSame('{applicant}/upload-file', $uploadPostRoute?->uri());
+        $this->assertSame('{applicant}/assessment-file', $assessmentFileRoute?->uri());
         $this->assertStringContainsString('brandKeyForHost', $access);
-        $this->assertStringContainsString("config('assessment_upload.brand_connections'", $access);
+        $this->assertStringContainsString("config('assessment_upload.connection'", $access);
         $this->assertStringContainsString("config('assessment_upload.host_brands', [])", $access);
         $this->assertStringContainsString('storeAssessmentDocument', $access);
+        $this->assertStringContainsString('assessmentDocumentForRequest', $access);
         $this->assertStringContainsString('applicant_upload_requests', $access);
         $this->assertStringContainsString('applicant_documents', $access);
         $this->assertStringContainsString('AssessmentUploadAccess', $verificationController);
         $this->assertStringContainsString('AssessmentUploadAccess', $uploadController);
+        $this->assertStringContainsString('Storage::disk($disk)->response', $assessmentFileController);
         $this->assertStringContainsString('$formAction', $verifyView);
         $this->assertStringContainsString('$formAction', $uploadView);
     }

@@ -1,20 +1,13 @@
 <?php
 
 return [
-    'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', 'tms'),
-
-    'brand_connections' => [
-        'rnb' => env('ASSESSMENT_UPLOAD_RNB_DB_CONNECTION', 'rnb'),
-        'trah' => env('ASSESSMENT_UPLOAD_TRAH_DB_CONNECTION', 'trah'),
-        'kma' => env('ASSESSMENT_UPLOAD_KMA_DB_CONNECTION', 'kma'),
-        'rne' => env('ASSESSMENT_UPLOAD_RNE_DB_CONNECTION', 'rne'),
-        'niskala' => env('ASSESSMENT_UPLOAD_NISKALA_DB_CONNECTION', 'niskala'),
-        'tms' => env('ASSESSMENT_UPLOAD_TMS_DB_CONNECTION', env('ASSESSMENT_UPLOAD_DB_CONNECTION', 'tms')),
-    ],
+    'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', env('DB_CONNECTION', 'mysql')),
 
     'default_brand' => 'rnb',
 
     'document_type' => 'assessment_test',
+
+    'storage_disk' => env('ASSESSMENT_UPLOAD_STORAGE_DISK', 'public'),
 
     'storage_directory' => 'uploaded-images',
 

@@ -85,12 +85,15 @@ class AssessmentUploadAccess
 
         abort_if($brandKey === null, 404);
 
-        $connection = $this->connection($brandKey);
+        $connection = $this->connection();
         $uploadRequest = $this->activeUploadRequest($applicantId, $brandKey);
 
         abort_if($uploadRequest === null, 404);
 
-        $path = $image->store((string) config('assessment_upload.storage_directory', 'uploaded-images'));
+        $path = $image->store(
+            (string) config('assessment_upload.storage_directory', 'uploaded-images'),
+            (string) config('assessment_upload.storage_disk', 'public'),
+        );
         $documentType = (string) config('assessment_upload.document_type', 'assessment_test');
         $now = now();
 
@@ -132,9 +135,33 @@ class AssessmentUploadAccess
         return basename($path);
     }
 
+    public function assessmentDocumentForRequest(string $applicantId, Request $request): object
+    {
+        $brandKey = $this->brandKeyForHost($request->getHost());
+
+        abort_if($brandKey === null, 404);
+
+        $applicant = $this->applicantRecord($applicantId, $brandKey);
+
+        abort_if($applicant === null, 404);
+        abort_unless($this->brandMatchesApplicant($brandKey, $applicant), 404);
+
+        $document = $this->connection()
+            ->table(self::DOCUMENTS_TABLE)
+            ->select(['file_path', 'original_name', 'mime_type'])
+            ->where('applicant_id', $applicantId)
+            ->where('document_type', (string) config('assessment_upload.document_type', 'assessment_test'))
+            ->latest('uploaded_at')
+            ->first();
+
+        abort_if($document === null, 404);
+
+        return $document;
+    }
+
     private function applicantRecord(string $applicantId, string $brandKey): ?object
     {
-        return $this->connection($brandKey)
+        return $this->connection()
             ->table(self::APPLICANTS_TABLE)
             ->select(['id', 'full_name', 'email', 'phone', 'brand_key'])
             ->where('id', $applicantId)
@@ -144,7 +171,7 @@ class AssessmentUploadAccess
 
     private function activeUploadRequest(string $applicantId, string $brandKey): ?object
     {
-        return $this->connection($brandKey)
+        return $this->connection()
             ->table(self::UPLOAD_REQUESTS_TABLE)
             ->select(['id'])
             ->where('applicant_id', $applicantId)
@@ -200,10 +227,9 @@ class AssessmentUploadAccess
         return preg_replace('/\D+/', '', (string) $applicant->phone) ?? '';
     }
 
-    private function connection(string $brandKey): ConnectionInterface
+    private function connection(): ConnectionInterface
     {
-        $connections = (array) config('assessment_upload.brand_connections', []);
-        $connection = $connections[$brandKey] ?? config('assessment_upload.connection', 'tms');
+        $connection = config('assessment_upload.connection', config('database.default', 'mysql'));
 
         return DB::connection((string) $connection);
     }

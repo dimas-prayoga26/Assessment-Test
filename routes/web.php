@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssessmentFileController;
 use App\Http\Controllers\UploadFileController;
 use App\Http\Controllers\UploadFileVerificationController;
 use Illuminate\Support\Facades\Route;
@@ -23,3 +24,7 @@ Route::get('/{applicant}/upload-file', [UploadFileController::class, 'create'])
 Route::post('/{applicant}/upload-file', [UploadFileController::class, 'store'])
     ->whereUuid('applicant')
     ->name('upload-files.generated.store');
+
+Route::get('/{applicant}/assessment-file', [AssessmentFileController::class, 'show'])
+    ->whereUuid('applicant')
+    ->name('assessment-files.show');

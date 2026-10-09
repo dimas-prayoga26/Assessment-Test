@@ -88,7 +88,7 @@ class UploadFileTest extends TestCase
             ->assertRedirect($this->generatedUploadRoute())
             ->assertSessionHasErrors('image');
 
-        Storage::disk('local')->assertMissing($file->hashName('uploaded-images'));
+        Storage::disk('public')->assertMissing($file->hashName('uploaded-images'));
     }
 
     public function test_upload_is_rejected_when_unverified(): void
@@ -104,7 +104,7 @@ class UploadFileTest extends TestCase
 
         $response->assertRedirect($this->generatedVerifyRoute());
 
-        Storage::disk('local')->assertMissing($image->hashName('uploaded-images'));
+        Storage::disk('public')->assertMissing($image->hashName('uploaded-images'));
     }
 
     private function mockAssessmentAccessForUpload(bool $verified): void
