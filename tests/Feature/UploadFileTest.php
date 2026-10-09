@@ -6,6 +6,7 @@ use App\Support\AssessmentUploadAccess;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use ZipArchive;
 
 class UploadFileTest extends TestCase
 {
@@ -21,8 +22,8 @@ class UploadFileTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Upload File')
-            ->assertSee('Hanya JPG dan PNG.');
+            ->assertSee('Upload Assessment Document')
+            ->assertSee('PDF and DOCX only.');
     }
 
     public function test_upload_file_page_shows_information_when_document_was_uploaded(): void
@@ -35,9 +36,9 @@ class UploadFileTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('For Your Information')
-            ->assertSee('Dokumen assessment sudah diterima')
-            ->assertDontSee('Upload File');
+            ->assertSee('Assessment document received')
+            ->assertDontSee('For Your Information')
+            ->assertDontSee('Upload Assessment Document');
     }
 
     public function test_upload_file_page_redirects_to_applicant_verification_when_unverified(): void
@@ -49,16 +50,16 @@ class UploadFileTest extends TestCase
         $response->assertRedirect($this->generatedVerifyRoute());
     }
 
-    public function test_jpg_image_upload_is_stored(): void
+    public function test_pdf_document_upload_is_stored(): void
     {
-        $this->mockAssessmentAccessForStore(verified: true, uploadedFile: 'profile.jpg');
+        $this->mockAssessmentAccessForStore(verified: true, uploadedFile: 'assessment.pdf');
 
-        $image = UploadedFile::fake()->image('profile.jpg');
+        $document = $this->fakePdf();
 
         $response = $this
             ->withSession(['upload_file_verified_applicant_id' => self::APPLICANT_ID])
             ->post($this->generatedUploadStoreRoute(), [
-                'image' => $image,
+                'document' => $document,
             ]);
 
         $response
@@ -66,21 +67,42 @@ class UploadFileTest extends TestCase
             ->assertSessionHas('status', 'File uploaded successfully.');
     }
 
-    public function test_png_image_upload_is_stored(): void
+    public function test_docx_document_upload_is_stored(): void
     {
-        $this->mockAssessmentAccessForStore(verified: true, uploadedFile: 'profile.png');
+        $this->mockAssessmentAccessForStore(verified: true, uploadedFile: 'assessment.docx');
 
-        $image = UploadedFile::fake()->image('profile.png');
+        $document = $this->fakeDocx();
 
         $response = $this
             ->withSession(['upload_file_verified_applicant_id' => self::APPLICANT_ID])
             ->post($this->generatedUploadStoreRoute(), [
-                'image' => $image,
+                'document' => $document,
             ]);
 
         $response
             ->assertRedirect($this->generatedUploadRoute())
             ->assertSessionHas('status', 'File uploaded successfully.');
+    }
+
+    public function test_jpg_image_upload_is_rejected(): void
+    {
+        Storage::fake('local');
+        $this->mockAssessmentAccessForUpload(verified: true);
+
+        $file = UploadedFile::fake()->image('profile.jpg');
+
+        $response = $this
+            ->withSession(['upload_file_verified_applicant_id' => self::APPLICANT_ID])
+            ->from($this->generatedUploadRoute())
+            ->post($this->generatedUploadStoreRoute(), [
+                'document' => $file,
+            ]);
+
+        $response
+            ->assertRedirect($this->generatedUploadRoute())
+            ->assertSessionHasErrors('document');
+
+        Storage::disk('public')->assertMissing($file->hashName('uploaded-images'));
     }
 
     public function test_text_file_upload_is_rejected(): void
@@ -96,14 +118,73 @@ class UploadFileTest extends TestCase
             ->withSession(['upload_file_verified_applicant_id' => self::APPLICANT_ID])
             ->from($this->generatedUploadRoute())
             ->post($this->generatedUploadStoreRoute(), [
-                'image' => $file,
+                'document' => $file,
             ]);
 
         $response
             ->assertRedirect($this->generatedUploadRoute())
-            ->assertSessionHasErrors('image');
+            ->assertSessionHasErrors('document');
 
         Storage::disk('public')->assertMissing($file->hashName('uploaded-images'));
+    }
+
+    public function test_pdf_with_active_content_is_rejected(): void
+    {
+        Storage::fake('local');
+        $this->mockAssessmentAccessForUpload(verified: true);
+
+        $document = $this->fakePdf('assessment.pdf', "%PDF-1.4\n/OpenAction << /S /JavaScript /JS (app.alert('x')) >>\n%%EOF");
+
+        $response = $this
+            ->withSession(['upload_file_verified_applicant_id' => self::APPLICANT_ID])
+            ->from($this->generatedUploadRoute())
+            ->post($this->generatedUploadStoreRoute(), [
+                'document' => $document,
+            ]);
+
+        $response
+            ->assertRedirect($this->generatedUploadRoute())
+            ->assertSessionHasErrors('document');
+    }
+
+    public function test_docx_with_macro_content_is_rejected(): void
+    {
+        Storage::fake('local');
+        $this->mockAssessmentAccessForUpload(verified: true);
+
+        $document = $this->fakeDocx('assessment.docx', [
+            'word/vbaProject.bin' => 'macro-content',
+        ]);
+
+        $response = $this
+            ->withSession(['upload_file_verified_applicant_id' => self::APPLICANT_ID])
+            ->from($this->generatedUploadRoute())
+            ->post($this->generatedUploadStoreRoute(), [
+                'document' => $document,
+            ]);
+
+        $response
+            ->assertRedirect($this->generatedUploadRoute())
+            ->assertSessionHasErrors('document');
+    }
+
+    public function test_document_with_unsafe_original_name_is_rejected(): void
+    {
+        Storage::fake('local');
+        $this->mockAssessmentAccessForUpload(verified: true);
+
+        $document = $this->fakePdf('assessment<script>.pdf');
+
+        $response = $this
+            ->withSession(['upload_file_verified_applicant_id' => self::APPLICANT_ID])
+            ->from($this->generatedUploadRoute())
+            ->post($this->generatedUploadStoreRoute(), [
+                'document' => $document,
+            ]);
+
+        $response
+            ->assertRedirect($this->generatedUploadRoute())
+            ->assertSessionHasErrors('document');
     }
 
     public function test_upload_is_rejected_when_unverified(): void
@@ -111,15 +192,15 @@ class UploadFileTest extends TestCase
         Storage::fake('local');
         $this->mockAssessmentAccessForUpload(verified: false);
 
-        $image = UploadedFile::fake()->image('profile.jpg');
+        $document = $this->fakePdf();
 
         $response = $this->post($this->generatedUploadStoreRoute(), [
-            'image' => $image,
+            'document' => $document,
         ]);
 
         $response->assertRedirect($this->generatedVerifyRoute());
 
-        Storage::disk('public')->assertMissing($image->hashName('uploaded-images'));
+        Storage::disk('public')->assertMissing($document->hashName('uploaded-images'));
     }
 
     private function mockAssessmentAccessForUpload(bool $verified): void
@@ -155,6 +236,41 @@ class UploadFileTest extends TestCase
             'id' => self::APPLICANT_ID,
             'full_name' => 'Assessment Applicant',
         ];
+    }
+
+    private function fakePdf(string $name = 'assessment.pdf', string $contents = "%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF"): UploadedFile
+    {
+        return UploadedFile::fake()
+            ->createWithContent($name, $contents)
+            ->mimeType('application/pdf');
+    }
+
+    /**
+     * @param  array<string, string>  $extraEntries
+     */
+    private function fakeDocx(string $name = 'assessment.docx', array $extraEntries = []): UploadedFile
+    {
+        $path = tempnam(sys_get_temp_dir(), 'assessment-docx-');
+
+        $zip = new ZipArchive;
+        $zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $zip->addFromString('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+        $zip->addFromString('_rels/.rels', '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+        $zip->addFromString('word/document.xml', '<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Assessment</w:t></w:r></w:p></w:body></w:document>');
+
+        foreach ($extraEntries as $entryName => $contents) {
+            $zip->addFromString($entryName, $contents);
+        }
+
+        $zip->close();
+
+        return new UploadedFile(
+            $path,
+            $name,
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            null,
+            true,
+        );
     }
 
     private function generatedVerifyRoute(): string

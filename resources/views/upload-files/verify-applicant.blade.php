@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Verifikasi Pelamar</title>
+    <title>Applicant Verification</title>
 
     @include('partials.branding-icon')
 
@@ -119,8 +119,8 @@
 <body>
     <main class="verify-panel">
         @if (! $isEmailVerified)
-            <h1>Verifikasi Email Pelamar</h1>
-            <p>Masukkan email pelamar sebelum membuka halaman upload{{ $applicantName ? ' untuk '.$applicantName : '' }}.</p>
+            <h1>Verify Applicant Email</h1>
+            <p>Enter the applicant email before opening the upload page{{ $applicantName ? ' for '.$applicantName : '' }}.</p>
 
             <form method="POST" action="{{ $formAction }}">
                 @csrf
@@ -135,17 +135,17 @@
                     @enderror
                 </div>
 
-                <button type="submit">Lanjut</button>
+                <button type="submit">Continue</button>
             </form>
         @else
-            <h1>Masukkan 4 Digit Terakhir Nomor HP</h1>
-            <p>Nomor HP terdaftar: <strong>{{ $maskedPhone }}</strong></p>
+            <h1>Enter the Last 4 Phone Digits</h1>
+            <p>Registered phone number: <strong>{{ $maskedPhone }}</strong></p>
 
             <form method="POST" action="{{ $formAction }}">
                 @csrf
                 <input type="hidden" name="step" value="pin">
 
-                <div class="pin-grid" aria-label="4 digit terakhir nomor HP">
+                <div class="pin-grid" aria-label="Last 4 phone digits">
                     @for ($index = 0; $index < 4; $index++)
                         <input class="pin-input" name="pin[]" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" aria-label="Digit {{ $index + 1 }}">
                     @endfor
@@ -159,7 +159,7 @@
                     <span class="error">{{ $message }}</span>
                 @enderror
 
-                <button type="submit">Lanjut</button>
+                <button type="submit">Continue</button>
             </form>
         @endif
     </main>

@@ -1,76 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+    <!-- Title -->
+    <title>Gymove  - Fitness Bootstrap Admin Dashboard Template</title>
+
+    <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="DexignZone">
+    <meta name="robots" content="">
+
+    <meta name="keywords" content="admin, admin dashboard, admin template, bootstrap, bootstrap 5, bootstrap 5 admin template, fitness, fitness admin, modern, responsive admin dashboard, sales dashboard, sass, ui kit, web app">
+    <meta name="description" content="Discover Gymove, the ultimate fitness solution that is designed to help you achieve a healthier lifestyle with its cutting-edge features and personalized programs. Gymove is a fully mobile-responsive admin dashboard template that provides the perfect blend of exercise, nutrition, and motivation. Begin your fitness journey today with Gymove and visit DexignZone for more information.">
+
+    <meta property="og:title" content="Gymove  - Fitness Bootstrap Admin Dashboard Template">
+    <meta property="og:description" content="Discover Gymove, the ultimate fitness solution that is designed to help you achieve a healthier lifestyle with its cutting-edge features and personalized programs. Gymove is a fully mobile-responsive admin dashboard template that provides the perfect blend of exercise, nutrition, and motivation. Begin your fitness journey today with Gymove and visit DexignZone for more information.">
+    <meta property="og:image" content="https://gymove.dexignzone.com/xhtml/social-image.avif">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Mobile Specific -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>404 - Halaman Tidak Ditemukan</title>
+    <!-- Favicon icon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('gymove/assets/images/favicon.avif') }}">
 
-    @include('partials.branding-icon')
+    <!-- Start - Basic CSS -->
+    <link href="{{ asset('gymove/assets/vendor/metismenu/dist/metisMenu.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('gymove/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('gymove/assets/vendor/chartist/css/chartist.min.css') }}">
+    <!-- End - Basic CSS -->
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+    <!-- Start - Switcher CSS -->
+    <link class="main-switcher" href="{{ asset('gymove/assets/css/switcher.css') }}" rel="stylesheet">
+    <!-- End - Switcher CSS -->
 
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: grid;
-            place-items: center;
-            padding: 32px 16px;
-            background: #f6f7fb;
-            color: #111827;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
+    <!-- Start - Style Css -->
+    <link class="main-plugins" href="{{ asset('gymove/assets/css/plugins.css') }}" rel="stylesheet">
+    <link class="main-css" href="{{ asset('gymove/assets/css/style.css') }}" rel="stylesheet">
+    <!-- End - Style Css -->
 
-        .error-page {
-            width: min(720px, 100%);
-            text-align: center;
-        }
-
-        .error-code {
-            position: relative;
-            display: inline-block;
-            color: #1e3fb4;
-            font-size: clamp(96px, 24vw, 210px);
-            font-weight: 900;
-            line-height: .8;
-            letter-spacing: 0;
-        }
-
-        .error-code::before {
-            position: absolute;
-            inset: 8px 0 0;
-            content: attr(data-text);
-            color: rgba(30, 63, 180, .12);
-            z-index: -1;
-        }
-
-        .error-title {
-            margin: 28px 0 10px;
-            font-size: clamp(24px, 5vw, 34px);
-            line-height: 1.2;
-        }
-
-        .error-copy {
-            max-width: 560px;
-            margin: 0 auto;
-            color: #6b7280;
-            font-size: 15px;
-            line-height: 1.7;
-        }
-    </style>
 </head>
 <body>
-    <main class="error-page" aria-labelledby="error-title">
-        <div class="error-code" data-text="404">404</div>
-        <h1 id="error-title" class="error-title">Halaman tidak ditemukan</h1>
-        <p class="error-copy">
-            Link assessment tidak valid, sudah tidak tersedia, atau tidak sesuai dengan brand/company yang digunakan.
-            Silakan periksa kembali tautan yang diberikan.
-        </p>
-    </main>
+
+    <!-- Start - Error Section -->
+    <div class="clearfix">
+        <div class="container">
+            <div class="row justify-content-center h-100 align-items-center">
+                <div class="col-xl-6 error-page">
+                    <div class="error-inner text-center">
+                        <div class="dz-error" data-text="404">404</div>
+                        <h2 class="error-head"><i class="fa fa-thumbs-down text-danger"></i> The page you were looking for is not found!</h2>
+                        <p>You may have mistyped the address or the page may have moved.</p>
+                        <div>
+                            <a class="btn btn-primary fs-16" href="{{ url('/') }}">Back to Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End - Error Section -->
+
+    <!-- Start - Page Scripts -->
+
+    <!-- Start - Script -->
+    <script src="{{ asset('gymove/assets/vendor/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('gymove/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('gymove/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js') }}"></script>
+    <script src="{{ asset('gymove/assets/vendor/@yaireo/tagify/dist/tagify.js') }}"></script>
+    <script src="{{ asset('gymove/assets/vendor/metismenu/dist/metisMenu.min.js') }}"></script>
+    <script src="{{ asset('gymove/assets/vendor/chart-js/chart.bundle.min.js') }}"></script>
+
+    <!-- Script For Custom JS -->
+    <script src="{{ asset('gymove/assets/js/deznav-init.js') }}"></script>
+    <script src="{{ asset('gymove/assets/js/custom.js') }}"></script>
+
+    <!-- Script For Multiple Languages -->
+    <script src="{{ asset('gymove/assets/vendor/i18n/i18n.js') }}"></script>
+    <script src="{{ asset('gymove/assets/js/translator.js') }}"></script>
+
 </body>
 </html>

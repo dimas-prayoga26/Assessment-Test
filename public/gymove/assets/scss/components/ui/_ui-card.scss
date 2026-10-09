@@ -1,0 +1,64 @@
+.card{
+    margin-bottom: 1.875rem;
+	height: calc(100% - $grid-gutter-width);
+	position: relative;
+    box-shadow: $card-box-shadow;
+    border: 0rem;
+    position: relative;
+    transition: all .5s ease-in-out;
+    border-radius: $card-border-radius;
+	
+	@include custommq($max: 35.9375rem){
+		margin-bottom: 0.938rem;
+		height: calc(100% - 0.938rem);
+	}
+    &-title{
+		&--large{
+            font-size: 1.5rem;
+        }
+        &--medium{
+            font-size: 1rem;
+        }
+        &--small{
+            font-size: 0.875rem;
+        }
+    }
+    &-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        
+		.card-title{
+            margin-bottom: 0rem;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .subtitle{
+            padding-top: 0.3125rem;
+            font-size: 0.875rem;
+			line-height: 1.5;
+        }
+    }
+}
+
+
+
+.card{
+	&.text-bg-primary,
+	&.text-bg-secondary,
+	&.text-bg-info,
+	&.text-bg-warning,
+	&.text-bg-success,
+	&.text-bg-dark,
+	&.text-bg-danger{
+		.card-title{
+			color: inherit;
+		}
+	}
+}
+.card-group > .card{
+	margin-bottom: unset;
+	height: unset;
+}

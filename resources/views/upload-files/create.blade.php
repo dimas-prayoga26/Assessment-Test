@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Upload File</title>
+    <title>Upload Assessment Document</title>
 
     @include('partials.branding-icon')
 
@@ -153,8 +153,8 @@
 <body>
     <main class="upload-shell">
         <section class="upload-panel" aria-labelledby="upload-title">
-            <h1 id="upload-title" class="upload-title">Upload File</h1>
-            <p class="upload-copy">Upload gambar JPG atau PNG. Maksimum ukuran file 2 MB.</p>
+            <h1 id="upload-title" class="upload-title">Upload Assessment Document</h1>
+            <p class="upload-copy">Upload a PDF or DOCX document. Maximum file size is 5 MB.</p>
 
             @if (session('status'))
                 <span class="upload-status">
@@ -168,25 +168,25 @@
             <form method="POST" action="{{ $formAction }}" enctype="multipart/form-data">
                 @csrf
 
-                <div id="image-dropzone" class="dropzone upload-dropzone">
-                    <label for="image" class="upload-dropzone-content">
-                        <input id="image" class="upload-input" name="image" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                <div id="document-dropzone" class="dropzone upload-dropzone">
+                    <label for="document" class="upload-dropzone-content">
+                        <input id="document" class="upload-input" name="document" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
                         <svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <path d="M27.1666 26.6667L20.4999 20L13.8333 26.6667" stroke="#DADADA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             <path d="M20.5 20V35" stroke="#DADADA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             <path d="M34.4833 30.6501C36.1088 29.7638 37.393 28.3615 38.1331 26.6644C38.8731 24.9673 39.027 23.0721 38.5703 21.2779C38.1136 19.4836 37.0724 17.8926 35.6111 16.7558C34.1497 15.619 32.3514 15.0013 30.4999 15.0001H28.3999C27.8955 13.0488 26.9552 11.2373 25.6498 9.70171C24.3445 8.16614 22.708 6.94647 20.8634 6.1344C19.0189 5.32233 17.0142 4.93899 15.0001 5.01319C12.9861 5.0874 11.015 5.61722 9.23523 6.56283C7.45541 7.50844 5.91312 8.84523 4.7243 10.4727C3.53549 12.1002 2.73108 13.9759 2.37157 15.959C2.01205 17.9421 2.10678 19.9809 2.64862 21.9222C3.19047 23.8634 4.16534 25.6565 5.49994 27.1667" stroke="#DADADA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             <path d="M27.1666 26.6667L20.4999 20L13.8333 26.6667" stroke="#DADADA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
-                        <span id="image-file-name" class="upload-file-name">Pilih atau drag file gambar ke sini</span>
-                        <span class="upload-hint">Hanya JPG dan PNG.</span>
+                        <span id="document-file-name" class="upload-file-name">Choose or drag your document here</span>
+                        <span class="upload-hint">PDF and DOCX only.</span>
                     </label>
                 </div>
 
-                @error('image')
+                @error('document')
                     <span class="upload-error">{{ $message }}</span>
                 @enderror
-
-                <button type="submit" class="upload-button">Upload</button>
+                
+                <button type="submit" class="upload-button">Submit Document</button>
             </form>
         </section>
     </main>
@@ -197,14 +197,14 @@
             Dropzone.autoDiscover = false;
         }
 
-        const dropzone = document.getElementById('image-dropzone');
-        const fileInput = document.getElementById('image');
-        const fileName = document.getElementById('image-file-name');
+        const dropzone = document.getElementById('document-dropzone');
+        const fileInput = document.getElementById('document');
+        const fileName = document.getElementById('document-file-name');
 
         const updateFileName = () => {
             fileName.textContent = fileInput.files.length > 0
                 ? fileInput.files[0].name
-                : 'Pilih atau drag file gambar ke sini';
+                : 'Choose or drag your document here';
         };
 
         fileInput.addEventListener('change', updateFileName);

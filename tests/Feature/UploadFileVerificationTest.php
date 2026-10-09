@@ -17,7 +17,7 @@ class UploadFileVerificationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Verifikasi Email Pelamar')
+            ->assertSee('Verify Applicant Email')
             ->assertSee('Assessment Applicant')
             ->assertDontSee('demo@example.com')
             ->assertDontSee('0812 3456 ****')
@@ -32,10 +32,10 @@ class UploadFileVerificationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('For Your Information')
-            ->assertSee('Dokumen assessment sudah diterima')
+            ->assertSee('Assessment document received')
             ->assertSee('Assessment Applicant')
-            ->assertDontSee('Verifikasi Email Pelamar');
+            ->assertDontSee('For Your Information')
+            ->assertDontSee('Verify Applicant Email');
     }
 
     public function test_valid_email_redirects_back_to_applicant_verification_phone_step(): void
@@ -61,9 +61,9 @@ class UploadFileVerificationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Masukkan 4 Digit Terakhir Nomor HP')
+            ->assertSee('Enter the Last 4 Phone Digits')
             ->assertSee('0812 3456 ****')
-            ->assertDontSee('Verifikasi Email Pelamar')
+            ->assertDontSee('Verify Applicant Email')
             ->assertDontSee('7890');
     }
 

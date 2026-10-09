@@ -1,0 +1,56 @@
+/*
+    
+	Name                 : Gymove
+    Author               : Dexignzone
+    Author Portfolio     : https://themeforest.net/user/dexignzone/portfolio
+    
+	
+	===== Table of Sass Contents =====
+	
+    01. Metis Menu css
+    02. Bootstrap SCSS Functions
+    03. Theme Custom Variables
+    04. Bootstrap SCSS
+    05. Theme Basic SCSS
+    06. Theme Helper SCSS
+    07. Header, Footer, Sidebar and Typography SCSS
+    08. Components, Widge, Table, Forms and App SCSS
+	09. Apps Pages
+	10. Pages SCSS
+
+*/
+
+@use "sass:math";
+
+// 1. Preloader SCSS
+@import "./preloader/preloader";
+
+// 02. Metis Menu css
+@import "../../../node_modules/metismenu/dist/metisMenu.min.css";
+
+// 03. Bootstrap SCSS Functions
+@import "../../../node_modules/bootstrap/scss/functions.scss";
+
+// 04. Theme Custom Variables
+@import "./abstracts/abstracts";
+
+// 05. Bootstrap SCSS
+@import "../../../node_modules/bootstrap/scss/bootstrap.scss";
+
+// 06. Theme Basic SCSS
+@import "./base/base";
+
+// 07. Theme Helper SCSS
+@import './helper/helper';
+
+// 08. Header, Footer, Sidebar and Typography SCSS
+@import "./layout/layout";
+
+// 09. Components, Widge, Table, Forms and App SCSS
+@import "./components/components";
+
+// 10. Apps Pages
+@import "./app/apps";
+
+// 11. Pages SCSS
+@import "./pages/pages"

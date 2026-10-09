@@ -92,7 +92,7 @@ class AssessmentUploadAccess
         return trim(substr($digits, 0, 4).' '.substr($digits, 4, -4).' ****');
     }
 
-    public function storeAssessmentDocument(string $applicantId, UploadedFile $image, Request $request): string
+    public function storeAssessmentDocument(string $applicantId, UploadedFile $documentFile, Request $request): string
     {
         $brandKey = $this->brandKeyForHost($request->getHost());
 
@@ -103,14 +103,14 @@ class AssessmentUploadAccess
 
         abort_if($uploadRequest === null, 404);
 
-        $path = $image->store(
+        $path = $documentFile->store(
             (string) config('assessment_upload.storage_directory', 'uploaded-images'),
             (string) config('assessment_upload.storage_disk', 'public'),
         );
         $documentType = (string) config('assessment_upload.document_type', 'assessment_test');
         $now = now();
 
-        $connection->transaction(function () use ($applicantId, $connection, $documentType, $image, $now, $path, $uploadRequest): void {
+        $connection->transaction(function () use ($applicantId, $connection, $documentFile, $documentType, $now, $path, $uploadRequest): void {
             $existingDocumentId = $connection
                 ->table(self::DOCUMENTS_TABLE)
                 ->where('applicant_id', $applicantId)
@@ -122,9 +122,9 @@ class AssessmentUploadAccess
                 'applicant_upload_request_id' => $uploadRequest->id,
                 'document_type' => $documentType,
                 'file_path' => $path,
-                'original_name' => $image->getClientOriginalName(),
-                'mime_type' => $image->getMimeType(),
-                'file_size' => $image->getSize(),
+                'original_name' => $documentFile->getClientOriginalName(),
+                'mime_type' => $documentFile->getMimeType(),
+                'file_size' => $documentFile->getSize(),
                 'uploaded_at' => $now,
                 'updated_at' => $now,
             ];

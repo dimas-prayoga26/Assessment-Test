@@ -58,7 +58,7 @@ class UploadFileVerificationController extends Controller
         if (! $this->assessmentUploadAccess->emailMatches($applicantRecord, $validated['email'])) {
             return back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Email tidak cocok dengan data pelamar.']);
+                ->withErrors(['email' => 'The email does not match the applicant record.']);
         }
 
         $this->assessmentUploadAccess->markEmailVerified($request, $applicant);
@@ -76,7 +76,7 @@ class UploadFileVerificationController extends Controller
         $applicantRecord = $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
 
         if (! $this->assessmentUploadAccess->phonePinMatches($applicantRecord, implode('', $validated['pin']))) {
-            return back()->withErrors(['pin' => '4 digit terakhir nomor HP tidak cocok.']);
+            return back()->withErrors(['pin' => 'The last 4 phone digits do not match the applicant record.']);
         }
 
         $this->assessmentUploadAccess->markUploadVerified($request, $applicant);

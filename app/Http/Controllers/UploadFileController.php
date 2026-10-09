@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\SafeAssessmentDocument;
 use App\Support\AssessmentUploadAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,8 +44,8 @@ class UploadFileController extends Controller
             return redirect()->route('upload-files.verify.applicant.generated', ['applicant' => $applicant]);
         }
 
-        $image = $this->validatedImage($request);
-        $uploadedFile = $this->assessmentUploadAccess->storeAssessmentDocument($applicant, $image, $request);
+        $document = $this->validatedDocument($request);
+        $uploadedFile = $this->assessmentUploadAccess->storeAssessmentDocument($applicant, $document, $request);
 
         return redirect()
             ->route('upload-files.generated.create', ['applicant' => $applicant])
@@ -52,15 +53,28 @@ class UploadFileController extends Controller
             ->with('uploaded_file', $uploadedFile);
     }
 
-    private function validatedImage(Request $request): UploadedFile
+    private function validatedDocument(Request $request): UploadedFile
     {
         $validated = $request->validate([
-            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'extensions:jpg,jpeg,png', 'max:2048'],
+            'document' => [
+                'required',
+                'file',
+                'mimes:pdf,docx',
+                'extensions:pdf,docx',
+                'max:5120',
+                new SafeAssessmentDocument,
+            ],
+        ], [
+            'document.required' => 'Please upload your assessment document.',
+            'document.file' => 'Please upload a valid assessment document.',
+            'document.mimes' => 'The document must be a PDF or DOCX file.',
+            'document.extensions' => 'The document file name must end in .pdf or .docx.',
+            'document.max' => 'The document may not be greater than 5 MB.',
         ]);
 
-        /** @var UploadedFile $image */
-        $image = $validated['image'];
+        /** @var UploadedFile $document */
+        $document = $validated['document'];
 
-        return $image;
+        return $document;
     }
 }

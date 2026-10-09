@@ -158,8 +158,9 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringContainsString('Storage::disk($disk)->response', $assessmentFileController);
         $this->assertStringContainsString('$formAction', $verifyView);
         $this->assertStringContainsString('$formAction', $uploadView);
-        $this->assertStringContainsString('Dokumen assessment sudah diterima', $informationView);
-        $this->assertStringContainsString('Halaman tidak ditemukan', $notFoundView);
+        $this->assertStringContainsString('Assessment document received', $informationView);
+        $this->assertStringContainsString('The page you were looking for is not found!', $notFoundView);
+        $this->assertStringContainsString("asset('gymove/assets/css/style.css')", $notFoundView);
     }
 
     public function test_assessment_test_contract_matches_andalan_migration_project(): void

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Informasi Upload</title>
+    <title>Upload Information</title>
 
     @include('partials.branding-icon')
 
@@ -32,15 +32,6 @@
             border-radius: 8px;
             background: #fff;
             box-shadow: 0 12px 40px rgba(15, 23, 42, .08);
-        }
-
-        .information-eyebrow {
-            margin: 0 0 10px;
-            color: #1e3fb4;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0;
-            text-transform: uppercase;
         }
 
         .information-title {
@@ -70,14 +61,12 @@
 </head>
 <body>
     <main class="information-panel" aria-labelledby="information-title">
-        <p class="information-eyebrow">For Your Information</p>
-        <h1 id="information-title" class="information-title">Dokumen assessment sudah diterima</h1>
+        <h1 id="information-title" class="information-title">Assessment document received</h1>
         <p class="information-copy">
-            Terima kasih{{ $applicantName ? ', '.$applicantName : '' }}. File assessment Anda sudah berhasil di-upload,
-            sehingga halaman verifikasi dan upload tidak perlu diisi kembali.
+            Thank you{{ $applicantName ? ', '.$applicantName : '' }}. Your assessment document has been uploaded successfully.
         </p>
         <div class="information-note">
-            Jika ada revisi atau permintaan upload ulang, silakan hubungi tim recruitment terkait.
+            If you need to revise or upload the document again, please contact the recruitment team.
         </div>
     </main>
 </body>

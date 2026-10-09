@@ -12,8 +12,8 @@ class ErrorPageTest extends TestCase
 
         $response
             ->assertNotFound()
-            ->assertSee('Halaman tidak ditemukan')
-            ->assertSee('Link assessment tidak valid');
+            ->assertSee('The page you were looking for is not found!')
+            ->assertSee('gymove/assets/css/style.css');
     }
 
     public function test_unknown_url_returns_custom_not_found_page(): void
@@ -23,6 +23,6 @@ class ErrorPageTest extends TestCase
         $response
             ->assertNotFound()
             ->assertSee('404')
-            ->assertSee('Halaman tidak ditemukan');
+            ->assertSee('Back to Home');
     }
 }
