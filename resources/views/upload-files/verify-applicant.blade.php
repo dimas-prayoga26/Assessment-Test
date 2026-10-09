@@ -120,16 +120,15 @@
     <main class="verify-panel">
         @if (! $isEmailVerified)
             <h1>Verifikasi Email Pelamar</h1>
-            <p>Masukkan email pelamar sebelum membuka halaman upload.</p>
+            <p>Masukkan email pelamar sebelum membuka halaman upload{{ $applicantName ? ' untuk '.$applicantName : '' }}.</p>
 
-            <form method="POST" action="{{ route('upload-files.verify.applicant.check') }}">
+            <form method="POST" action="{{ $formAction }}">
                 @csrf
                 <input type="hidden" name="step" value="email">
 
                 <div class="field-group">
                     <label for="email">Email</label>
                     <input id="email" class="email-input" name="email" type="email" value="{{ old('email') }}" autocomplete="email" autofocus>
-                    <span class="hint">Dummy: {{ $dummyEmail }}</span>
 
                     @error('email')
                         <span class="error">{{ $message }}</span>
@@ -142,7 +141,7 @@
             <h1>Masukkan 4 Digit Terakhir Nomor HP</h1>
             <p>Nomor HP terdaftar: <strong>{{ $maskedPhone }}</strong></p>
 
-            <form method="POST" action="{{ route('upload-files.verify.applicant.check') }}">
+            <form method="POST" action="{{ $formAction }}">
                 @csrf
                 <input type="hidden" name="step" value="pin">
 

@@ -2,82 +2,93 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\AssessmentUploadAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class UploadFileVerificationController extends Controller
 {
-    private const DUMMY_EMAIL = 'demo@example.com';
+    public function __construct(private AssessmentUploadAccess $assessmentUploadAccess) {}
 
-    private const DUMMY_PHONE = '081234567890';
-
-    public function applicant(): View
+    public function applicant(Request $request, string $applicant): View
     {
+        $applicantRecord = $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
+
         return view('upload-files.verify-applicant', [
-            'dummyEmail' => self::DUMMY_EMAIL,
-            'isEmailVerified' => session('upload_file_email_verified', false),
-            'maskedPhone' => $this->maskedPhone(),
+            'applicantId' => $applicant,
+            'applicantName' => $applicantRecord?->full_name,
+            'formAction' => $this->verificationCheckRoute($applicant),
+            'isEmailVerified' => $this->assessmentUploadAccess->isEmailVerified($request, $applicant),
+            'maskedPhone' => $this->assessmentUploadAccess->maskedPhone($applicantRecord),
         ]);
     }
 
-    public function checkApplicant(Request $request): RedirectResponse
+    public function checkApplicant(Request $request, string $applicant): RedirectResponse
     {
+        $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
+
         $validatedStep = $request->validate([
             'step' => ['required', 'in:email,pin'],
         ]);
 
         if ($validatedStep['step'] === 'email') {
-            return $this->checkEmail($request);
+            return $this->checkEmail($request, $applicant);
         }
 
-        return $this->checkPin($request);
+        return $this->checkPin($request, $applicant);
     }
 
-    private function checkEmail(Request $request): RedirectResponse
+    private function checkEmail(Request $request, string $applicant): RedirectResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'email'],
         ]);
 
-        if (Str::lower($validated['email']) !== self::DUMMY_EMAIL) {
+        $applicantRecord = $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
+
+        if (! $this->assessmentUploadAccess->emailMatches($applicantRecord, $validated['email'])) {
             return back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Email tidak cocok dengan data dummy.']);
+                ->withErrors(['email' => 'Email tidak cocok dengan data pelamar.']);
         }
 
-        $request->session()->put('upload_file_email_verified', true);
-        $request->session()->forget('upload_file_verified');
+        $this->assessmentUploadAccess->markEmailVerified($request, $applicant);
 
-        return redirect()->route('upload-files.verify.applicant');
+        return redirect()->route('upload-files.verify.applicant.generated', ['applicant' => $applicant]);
     }
 
-    private function checkPin(Request $request): RedirectResponse
+    private function checkPin(Request $request, string $applicant): RedirectResponse
     {
-        if (! $request->session()->get('upload_file_email_verified')) {
-            return redirect()->route('upload-files.verify.applicant');
+        if (! $this->assessmentUploadAccess->isEmailVerified($request, $applicant)) {
+            return redirect()->route('upload-files.verify.applicant.generated', ['applicant' => $applicant]);
         }
 
-        $validated = $request->validate([
-            'pin' => ['required', 'array', 'size:4'],
-            'pin.*' => ['required', 'digits:1'],
-        ]);
+        $validated = $this->validatePin($request);
+        $applicantRecord = $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
 
-        $pin = implode('', $validated['pin']);
-
-        if ($pin !== substr(self::DUMMY_PHONE, -4)) {
+        if (! $this->assessmentUploadAccess->phonePinMatches($applicantRecord, implode('', $validated['pin']))) {
             return back()->withErrors(['pin' => '4 digit terakhir nomor HP tidak cocok.']);
         }
 
-        $request->session()->put('upload_file_verified', true);
-        $request->session()->forget('upload_file_email_verified');
+        $this->assessmentUploadAccess->markUploadVerified($request, $applicant);
 
-        return redirect()->route('upload-files.create');
+        return redirect()->route('upload-files.generated.create', ['applicant' => $applicant]);
     }
 
-    private function maskedPhone(): string
+    /**
+     * @return array{pin: array<int, string>}
+     */
+    private function validatePin(Request $request): array
     {
-        return substr(self::DUMMY_PHONE, 0, 4).' '.substr(self::DUMMY_PHONE, 4, -4).' ****';
+        return $request->validate([
+            'pin' => ['required', 'array', 'size:4'],
+            'pin.*' => ['required', 'digits:1'],
+        ]);
+    }
+
+    private function verificationCheckRoute(string $applicant): string
+    {
+        return route('upload-files.verify.applicant.generated.check', ['applicant' => $applicant]);
     }
 }

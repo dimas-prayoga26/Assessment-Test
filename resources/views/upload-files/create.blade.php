@@ -165,7 +165,7 @@
                 </span>
             @endif
 
-            <form method="POST" action="{{ route('upload-files.store') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ $formAction }}" enctype="multipart/form-data">
                 @csrf
 
                 <div id="image-dropzone" class="dropzone upload-dropzone">

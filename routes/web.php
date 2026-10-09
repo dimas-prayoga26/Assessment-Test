@@ -8,14 +8,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/upload-file/verify-applicant', [UploadFileVerificationController::class, 'applicant'])
-    ->name('upload-files.verify.applicant');
+Route::get('/{applicant}/upload-file/verify-applicant', [UploadFileVerificationController::class, 'applicant'])
+    ->whereUuid('applicant')
+    ->name('upload-files.verify.applicant.generated');
 
-Route::post('/upload-file/verify-applicant', [UploadFileVerificationController::class, 'checkApplicant'])
-    ->name('upload-files.verify.applicant.check');
+Route::post('/{applicant}/upload-file/verify-applicant', [UploadFileVerificationController::class, 'checkApplicant'])
+    ->whereUuid('applicant')
+    ->name('upload-files.verify.applicant.generated.check');
 
-Route::get('/upload-file', [UploadFileController::class, 'create'])
-    ->name('upload-files.create');
+Route::get('/{applicant}/upload-file', [UploadFileController::class, 'create'])
+    ->whereUuid('applicant')
+    ->name('upload-files.generated.create');
 
-Route::post('/upload-file', [UploadFileController::class, 'store'])
-    ->name('upload-files.store');
+Route::post('/{applicant}/upload-file', [UploadFileController::class, 'store'])
+    ->whereUuid('applicant')
+    ->name('upload-files.generated.store');
