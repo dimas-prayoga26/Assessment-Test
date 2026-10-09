@@ -41,6 +41,220 @@
     <link class="main-css" href="/gymove/assets/css/style.css" rel="stylesheet">
     <!-- End - Style Css -->
 
+    <style>
+        :root {
+            --bs-primary: #2444c9;
+            --bs-heading-color: #17213b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: #f7f7f8;
+            color: #17213b;
+            font-family: Poppins, Arial, Helvetica, sans-serif;
+        }
+
+        .clearfix::after {
+            clear: both;
+            content: "";
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1320px;
+            margin-right: auto;
+            margin-left: auto;
+            padding-right: 12px;
+            padding-left: 12px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -12px;
+            margin-left: -12px;
+        }
+
+        .justify-content-center {
+            justify-content: center;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .h-100 {
+            height: 100%;
+        }
+
+        .col-xl-6 {
+            width: 100%;
+            max-width: 50%;
+            padding-right: 12px;
+            padding-left: 12px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .error-page {
+            min-height: 100vh;
+            position: relative;
+            background-blend-mode: luminosity;
+            background-size: cover;
+        }
+
+        .error-inner {
+            z-index: 1;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            transform: translate(-50%, -50%);
+        }
+
+        .dz-error {
+            position: relative;
+            color: var(--bs-heading-color);
+            font-size: 200px;
+            font-weight: 900;
+            line-height: 200px;
+            letter-spacing: 0;
+            margin: auto;
+            animation: dzError 1s infinite linear alternate-reverse;
+        }
+
+        .dz-error::before,
+        .dz-error::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .dz-error::before {
+            left: 2px;
+            color: inherit;
+            text-shadow: -2px 0 #f7cf47;
+            clip-path: inset(36% 0 52% 0);
+        }
+
+        .dz-error::after {
+            left: -2px;
+            color: inherit;
+            text-shadow: -2px 0 #f7cf47, 2px 2px #f7cf47;
+            clip-path: inset(52% 0 36% 0);
+        }
+
+        .error-head {
+            margin: 0 0 5px;
+            color: #081833;
+            font-size: 36px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        .error-head i {
+            color: #ff4b93;
+            font-style: normal;
+            font-size: 85%;
+        }
+
+        .error-head i::before {
+            content: "👎";
+        }
+
+        .error-page p {
+            max-width: 480px;
+            margin: 0 auto 30px;
+            color: #7d7f88;
+            font-size: 18px;
+            line-height: 1.45;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 45px;
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            font-weight: 600;
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .btn-primary {
+            background: var(--bs-primary);
+            color: #fff;
+        }
+
+        .fs-16 {
+            font-size: 16px;
+        }
+
+        @keyframes dzError {
+            0% {
+                transform: skew(-2deg);
+            }
+
+            100% {
+                transform: skew(2deg);
+            }
+        }
+
+        @media (max-width: 1199.98px) {
+            .col-xl-6 {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .dz-error {
+                font-size: 150px;
+                line-height: 150px;
+            }
+
+            .error-head {
+                font-size: 30px;
+            }
+
+            .error-page p {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .dz-error {
+                margin-bottom: 10px;
+                font-size: 80px;
+                line-height: 80px;
+                letter-spacing: 5px;
+            }
+
+            .error-head {
+                font-size: 24px;
+            }
+
+            .error-page p {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+
 </head>
 <body>
 
