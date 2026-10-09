@@ -13,7 +13,7 @@ class ErrorPageTest extends TestCase
         $response
             ->assertNotFound()
             ->assertSee('The page you were looking for is not found!')
-            ->assertSee('gymove/assets/css/style.css');
+            ->assertSee('/gymove/assets/css/style.css');
     }
 
     public function test_unknown_url_returns_custom_not_found_page(): void

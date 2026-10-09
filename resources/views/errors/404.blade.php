@@ -24,21 +24,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Favicon icon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('gymove/assets/images/favicon.avif') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="/gymove/assets/images/favicon.avif">
 
     <!-- Start - Basic CSS -->
-    <link href="{{ asset('gymove/assets/vendor/metismenu/dist/metisMenu.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('gymove/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('gymove/assets/vendor/chartist/css/chartist.min.css') }}">
+    <link href="/gymove/assets/vendor/metismenu/dist/metisMenu.min.css" rel="stylesheet">
+    <link href="/gymove/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/gymove/assets/vendor/chartist/css/chartist.min.css">
     <!-- End - Basic CSS -->
 
     <!-- Start - Switcher CSS -->
-    <link class="main-switcher" href="{{ asset('gymove/assets/css/switcher.css') }}" rel="stylesheet">
+    <link class="main-switcher" href="/gymove/assets/css/switcher.css" rel="stylesheet">
     <!-- End - Switcher CSS -->
 
     <!-- Start - Style Css -->
-    <link class="main-plugins" href="{{ asset('gymove/assets/css/plugins.css') }}" rel="stylesheet">
-    <link class="main-css" href="{{ asset('gymove/assets/css/style.css') }}" rel="stylesheet">
+    <link class="main-plugins" href="/gymove/assets/css/plugins.css" rel="stylesheet">
+    <link class="main-css" href="/gymove/assets/css/style.css" rel="stylesheet">
     <!-- End - Style Css -->
 
 </head>
@@ -54,7 +54,7 @@
                         <h2 class="error-head"><i class="fa fa-thumbs-down text-danger"></i> The page you were looking for is not found!</h2>
                         <p>You may have mistyped the address or the page may have moved.</p>
                         <div>
-                            <a class="btn btn-primary fs-16" href="{{ url('/') }}">Back to Home</a>
+                            <a class="btn btn-primary fs-16" href="/">Back to Home</a>
                         </div>
                     </div>
                 </div>
@@ -66,20 +66,20 @@
     <!-- Start - Page Scripts -->
 
     <!-- Start - Script -->
-    <script src="{{ asset('gymove/assets/vendor/jquery/dist/jquery.min.js') }}"></script>
-    <script src="{{ asset('gymove/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('gymove/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js') }}"></script>
-    <script src="{{ asset('gymove/assets/vendor/@yaireo/tagify/dist/tagify.js') }}"></script>
-    <script src="{{ asset('gymove/assets/vendor/metismenu/dist/metisMenu.min.js') }}"></script>
-    <script src="{{ asset('gymove/assets/vendor/chart-js/chart.bundle.min.js') }}"></script>
+    <script src="/gymove/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/gymove/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/gymove/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+    <script src="/gymove/assets/vendor/@yaireo/tagify/dist/tagify.js"></script>
+    <script src="/gymove/assets/vendor/metismenu/dist/metisMenu.min.js"></script>
+    <script src="/gymove/assets/vendor/chart-js/chart.bundle.min.js"></script>
 
     <!-- Script For Custom JS -->
-    <script src="{{ asset('gymove/assets/js/deznav-init.js') }}"></script>
-    <script src="{{ asset('gymove/assets/js/custom.js') }}"></script>
+    <script src="/gymove/assets/js/deznav-init.js"></script>
+    <script src="/gymove/assets/js/custom.js"></script>
 
     <!-- Script For Multiple Languages -->
-    <script src="{{ asset('gymove/assets/vendor/i18n/i18n.js') }}"></script>
-    <script src="{{ asset('gymove/assets/js/translator.js') }}"></script>
+    <script src="/gymove/assets/vendor/i18n/i18n.js"></script>
+    <script src="/gymove/assets/js/translator.js"></script>
 
 </body>
 </html>
