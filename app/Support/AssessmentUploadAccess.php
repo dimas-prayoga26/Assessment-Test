@@ -20,7 +20,7 @@ class AssessmentUploadAccess
 
     private const UPLOAD_VERIFIED_SESSION_KEY = 'upload_file_verified_applicant_id';
 
-    public function applicantForRequest(string $applicantId, Request $request): object
+    public function applicantForRequest(string $applicantId, Request $request, bool $allowCompletedUpload = false): object
     {
         $brandKey = $this->brandKeyForHost($request->getHost());
 
@@ -30,9 +30,22 @@ class AssessmentUploadAccess
 
         abort_if($applicant === null, 404);
         abort_unless($this->brandMatchesApplicant($brandKey, $applicant), 404);
-        abort_if($this->activeUploadRequest($applicantId) === null, 404);
+        abort_if(
+            $this->activeUploadRequest($applicantId) === null
+            && (! $allowCompletedUpload || ! $this->hasAssessmentDocument($applicantId)),
+            404,
+        );
 
         return $applicant;
+    }
+
+    public function hasAssessmentDocument(string $applicantId): bool
+    {
+        return $this->connection()
+            ->table(self::DOCUMENTS_TABLE)
+            ->where('applicant_id', $applicantId)
+            ->where('document_type', (string) config('assessment_upload.document_type', 'assessment_test'))
+            ->exists();
     }
 
     public function isEmailVerified(Request $request, string $applicantId): bool

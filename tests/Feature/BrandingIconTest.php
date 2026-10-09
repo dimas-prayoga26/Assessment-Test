@@ -42,6 +42,7 @@ class BrandingIconTest extends TestCase
                 'id' => self::APPLICANT_ID,
                 'full_name' => 'Assessment Applicant',
             ]);
+            $mock->shouldReceive('hasAssessmentDocument')->andReturn(false);
             $mock->shouldReceive('isEmailVerified')->andReturn(false);
             $mock->shouldReceive('maskedPhone')->andReturn('0812 3456 ****');
         });

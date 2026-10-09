@@ -14,7 +14,13 @@ class UploadFileController extends Controller
 
     public function create(Request $request, string $applicant): RedirectResponse|View
     {
-        $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
+        $applicantRecord = $this->assessmentUploadAccess->applicantForRequest($applicant, $request, allowCompletedUpload: true);
+
+        if ($this->assessmentUploadAccess->hasAssessmentDocument($applicant)) {
+            return view('upload-files.information', [
+                'applicantName' => $applicantRecord->full_name ?? null,
+            ]);
+        }
 
         if (! $this->assessmentUploadAccess->isUploadVerified($request, $applicant)) {
             return redirect()->route('upload-files.verify.applicant.generated', ['applicant' => $applicant]);
@@ -27,7 +33,11 @@ class UploadFileController extends Controller
 
     public function store(Request $request, string $applicant): RedirectResponse
     {
-        $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
+        $this->assessmentUploadAccess->applicantForRequest($applicant, $request, allowCompletedUpload: true);
+
+        if ($this->assessmentUploadAccess->hasAssessmentDocument($applicant)) {
+            return redirect()->route('upload-files.generated.create', ['applicant' => $applicant]);
+        }
 
         if (! $this->assessmentUploadAccess->isUploadVerified($request, $applicant)) {
             return redirect()->route('upload-files.verify.applicant.generated', ['applicant' => $applicant]);

@@ -6,7 +6,7 @@ use App\Http\Controllers\UploadFileVerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    abort(404);
 });
 
 Route::get('/{applicant}/upload-file/verify-applicant', [UploadFileVerificationController::class, 'applicant'])
@@ -28,3 +28,7 @@ Route::post('/{applicant}/upload-file', [UploadFileController::class, 'store'])
 Route::get('/{applicant}/assessment-file', [AssessmentFileController::class, 'show'])
     ->whereUuid('applicant')
     ->name('assessment-files.show');
+
+Route::fallback(function () {
+    abort(404);
+});

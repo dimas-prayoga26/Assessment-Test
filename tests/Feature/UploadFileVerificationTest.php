@@ -24,6 +24,20 @@ class UploadFileVerificationTest extends TestCase
             ->assertDontSee('7890');
     }
 
+    public function test_applicant_verification_page_shows_information_when_document_was_uploaded(): void
+    {
+        $this->mockAssessmentAccessForCompletedUpload();
+
+        $response = $this->get($this->generatedVerifyRoute());
+
+        $response
+            ->assertOk()
+            ->assertSee('For Your Information')
+            ->assertSee('Dokumen assessment sudah diterima')
+            ->assertSee('Assessment Applicant')
+            ->assertDontSee('Verifikasi Email Pelamar');
+    }
+
     public function test_valid_email_redirects_back_to_applicant_verification_phone_step(): void
     {
         $this->mockAssessmentAccessForEmailCheck(emailMatches: true);
@@ -117,6 +131,7 @@ class UploadFileVerificationTest extends TestCase
     {
         $this->mock(AssessmentUploadAccess::class, function ($mock): void {
             $mock->shouldReceive('applicantForRequest')->andReturn($this->applicantRecord());
+            $mock->shouldReceive('hasAssessmentDocument')->andReturn(false);
             $mock->shouldReceive('isEmailVerified')->andReturn(false);
             $mock->shouldReceive('maskedPhone')->andReturn('0812 3456 ****');
         });
@@ -126,6 +141,7 @@ class UploadFileVerificationTest extends TestCase
     {
         $this->mock(AssessmentUploadAccess::class, function ($mock): void {
             $mock->shouldReceive('applicantForRequest')->andReturn($this->applicantRecord());
+            $mock->shouldReceive('hasAssessmentDocument')->andReturn(false);
             $mock->shouldReceive('isEmailVerified')->andReturn(true);
             $mock->shouldReceive('maskedPhone')->andReturn('0812 3456 ****');
         });
@@ -135,6 +151,7 @@ class UploadFileVerificationTest extends TestCase
     {
         $this->mock(AssessmentUploadAccess::class, function ($mock) use ($emailMatches): void {
             $mock->shouldReceive('applicantForRequest')->andReturn($this->applicantRecord());
+            $mock->shouldReceive('hasAssessmentDocument')->andReturn(false);
             $mock->shouldReceive('emailMatches')->andReturn($emailMatches);
             $mock->shouldReceive('markEmailVerified')->zeroOrMoreTimes();
         });
@@ -144,6 +161,7 @@ class UploadFileVerificationTest extends TestCase
     {
         $this->mock(AssessmentUploadAccess::class, function ($mock) use ($pinMatches): void {
             $mock->shouldReceive('applicantForRequest')->andReturn($this->applicantRecord());
+            $mock->shouldReceive('hasAssessmentDocument')->andReturn(false);
             $mock->shouldReceive('isEmailVerified')->andReturn(true);
             $mock->shouldReceive('phonePinMatches')->andReturn($pinMatches);
             $mock->shouldReceive('markUploadVerified')->zeroOrMoreTimes();
@@ -154,7 +172,16 @@ class UploadFileVerificationTest extends TestCase
     {
         $this->mock(AssessmentUploadAccess::class, function ($mock): void {
             $mock->shouldReceive('applicantForRequest')->andReturn($this->applicantRecord());
+            $mock->shouldReceive('hasAssessmentDocument')->andReturn(false);
             $mock->shouldReceive('isEmailVerified')->andReturn(false);
+        });
+    }
+
+    private function mockAssessmentAccessForCompletedUpload(): void
+    {
+        $this->mock(AssessmentUploadAccess::class, function ($mock): void {
+            $mock->shouldReceive('applicantForRequest')->andReturn($this->applicantRecord());
+            $mock->shouldReceive('hasAssessmentDocument')->andReturn(true);
         });
     }
 

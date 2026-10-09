@@ -124,6 +124,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $uploadRoute = Route::getRoutes()->getByName('upload-files.generated.create');
         $uploadPostRoute = Route::getRoutes()->getByName('upload-files.generated.store');
         $assessmentFileRoute = Route::getRoutes()->getByName('assessment-files.show');
+        $routes = File::get(base_path('routes/web.php'));
         $access = File::get(app_path('Support/AssessmentUploadAccess.php'));
         $assessmentConfig = File::get(config_path('assessment_upload.php'));
         $databaseConfig = File::get(config_path('database.php'));
@@ -132,12 +133,15 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $assessmentFileController = File::get(app_path('Http/Controllers/AssessmentFileController.php'));
         $verifyView = File::get(resource_path('views/upload-files/verify-applicant.blade.php'));
         $uploadView = File::get(resource_path('views/upload-files/create.blade.php'));
+        $informationView = File::get(resource_path('views/upload-files/information.blade.php'));
+        $notFoundView = File::get(resource_path('views/errors/404.blade.php'));
 
         $this->assertSame('{applicant}/upload-file/verify-applicant', $verifyRoute?->uri());
         $this->assertSame('{applicant}/upload-file/verify-applicant', $verifyPostRoute?->uri());
         $this->assertSame('{applicant}/upload-file', $uploadRoute?->uri());
         $this->assertSame('{applicant}/upload-file', $uploadPostRoute?->uri());
         $this->assertSame('{applicant}/assessment-file', $assessmentFileRoute?->uri());
+        $this->assertStringContainsString('Route::fallback(function ()', $routes);
         $this->assertStringContainsString('brandKeyForHost', $access);
         $this->assertStringContainsString("config('assessment_upload.connection'", $access);
         $this->assertStringContainsString("config('assessment_upload.host_brands', [])", $access);
@@ -149,9 +153,13 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringContainsString('applicant_documents', $access);
         $this->assertStringContainsString('AssessmentUploadAccess', $verificationController);
         $this->assertStringContainsString('AssessmentUploadAccess', $uploadController);
+        $this->assertStringContainsString('hasAssessmentDocument', $verificationController);
+        $this->assertStringContainsString('hasAssessmentDocument', $uploadController);
         $this->assertStringContainsString('Storage::disk($disk)->response', $assessmentFileController);
         $this->assertStringContainsString('$formAction', $verifyView);
         $this->assertStringContainsString('$formAction', $uploadView);
+        $this->assertStringContainsString('Dokumen assessment sudah diterima', $informationView);
+        $this->assertStringContainsString('Halaman tidak ditemukan', $notFoundView);
     }
 
     public function test_assessment_test_contract_matches_andalan_migration_project(): void

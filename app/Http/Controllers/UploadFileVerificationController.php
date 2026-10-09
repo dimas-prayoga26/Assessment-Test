@@ -13,7 +13,11 @@ class UploadFileVerificationController extends Controller
 
     public function applicant(Request $request, string $applicant): View
     {
-        $applicantRecord = $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
+        $applicantRecord = $this->assessmentUploadAccess->applicantForRequest($applicant, $request, allowCompletedUpload: true);
+
+        if ($this->assessmentUploadAccess->hasAssessmentDocument($applicant)) {
+            return $this->uploadedInformationView($applicantRecord);
+        }
 
         return view('upload-files.verify-applicant', [
             'applicantId' => $applicant,
@@ -26,7 +30,11 @@ class UploadFileVerificationController extends Controller
 
     public function checkApplicant(Request $request, string $applicant): RedirectResponse
     {
-        $this->assessmentUploadAccess->applicantForRequest($applicant, $request);
+        $this->assessmentUploadAccess->applicantForRequest($applicant, $request, allowCompletedUpload: true);
+
+        if ($this->assessmentUploadAccess->hasAssessmentDocument($applicant)) {
+            return redirect()->route('upload-files.generated.create', ['applicant' => $applicant]);
+        }
 
         $validatedStep = $request->validate([
             'step' => ['required', 'in:email,pin'],
@@ -90,5 +98,12 @@ class UploadFileVerificationController extends Controller
     private function verificationCheckRoute(string $applicant): string
     {
         return route('upload-files.verify.applicant.generated.check', ['applicant' => $applicant]);
+    }
+
+    private function uploadedInformationView(object $applicant): View
+    {
+        return view('upload-files.information', [
+            'applicantName' => $applicant->full_name ?? null,
+        ]);
     }
 }
