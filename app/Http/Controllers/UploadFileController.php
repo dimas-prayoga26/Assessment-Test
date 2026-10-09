@@ -34,7 +34,7 @@ class UploadFileController extends Controller
         }
 
         $image = $this->validatedImage($request);
-        $uploadedFile = $this->assessmentUploadAccess->storeAssessmentDocument($applicant, $image);
+        $uploadedFile = $this->assessmentUploadAccess->storeAssessmentDocument($applicant, $image, $request);
 
         return redirect()
             ->route('upload-files.generated.create', ['applicant' => $applicant])

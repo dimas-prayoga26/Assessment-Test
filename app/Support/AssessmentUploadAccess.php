@@ -22,11 +22,15 @@ class AssessmentUploadAccess
 
     public function applicantForRequest(string $applicantId, Request $request): object
     {
-        $applicant = $this->applicantRecord($applicantId);
+        $brandKey = $this->brandKeyForHost($request->getHost());
+
+        abort_if($brandKey === null, 404);
+
+        $applicant = $this->applicantRecord($applicantId, $brandKey);
 
         abort_if($applicant === null, 404);
-        abort_unless($this->hostMatchesApplicantBrand($request->getHost(), $applicant), 404);
-        abort_if($this->activeUploadRequest($applicantId) === null, 404);
+        abort_unless($this->brandMatchesApplicant($brandKey, $applicant), 404);
+        abort_if($this->activeUploadRequest($applicantId, $brandKey) === null, 404);
 
         return $applicant;
     }
@@ -75,9 +79,14 @@ class AssessmentUploadAccess
         return trim(substr($digits, 0, 4).' '.substr($digits, 4, -4).' ****');
     }
 
-    public function storeAssessmentDocument(string $applicantId, UploadedFile $image): string
+    public function storeAssessmentDocument(string $applicantId, UploadedFile $image, Request $request): string
     {
-        $uploadRequest = $this->activeUploadRequest($applicantId);
+        $brandKey = $this->brandKeyForHost($request->getHost());
+
+        abort_if($brandKey === null, 404);
+
+        $connection = $this->connection($brandKey);
+        $uploadRequest = $this->activeUploadRequest($applicantId, $brandKey);
 
         abort_if($uploadRequest === null, 404);
 
@@ -85,8 +94,8 @@ class AssessmentUploadAccess
         $documentType = (string) config('assessment_upload.document_type', 'assessment_test');
         $now = now();
 
-        $this->connection()->transaction(function () use ($applicantId, $documentType, $image, $now, $path, $uploadRequest): void {
-            $existingDocumentId = $this->connection()
+        $connection->transaction(function () use ($applicantId, $connection, $documentType, $image, $now, $path, $uploadRequest): void {
+            $existingDocumentId = $connection
                 ->table(self::DOCUMENTS_TABLE)
                 ->where('applicant_id', $applicantId)
                 ->where('document_type', $documentType)
@@ -105,12 +114,12 @@ class AssessmentUploadAccess
             ];
 
             if (is_string($existingDocumentId) && $existingDocumentId !== '') {
-                $this->connection()
+                $connection
                     ->table(self::DOCUMENTS_TABLE)
                     ->where('id', $existingDocumentId)
                     ->update($document);
             } else {
-                $this->connection()
+                $connection
                     ->table(self::DOCUMENTS_TABLE)
                     ->insert([
                         ...$document,
@@ -123,9 +132,9 @@ class AssessmentUploadAccess
         return basename($path);
     }
 
-    private function applicantRecord(string $applicantId): ?object
+    private function applicantRecord(string $applicantId, string $brandKey): ?object
     {
-        return $this->connection()
+        return $this->connection($brandKey)
             ->table(self::APPLICANTS_TABLE)
             ->select(['id', 'full_name', 'email', 'phone', 'brand_key'])
             ->where('id', $applicantId)
@@ -133,9 +142,9 @@ class AssessmentUploadAccess
             ->first();
     }
 
-    private function activeUploadRequest(string $applicantId): ?object
+    private function activeUploadRequest(string $applicantId, string $brandKey): ?object
     {
-        return $this->connection()
+        return $this->connection($brandKey)
             ->table(self::UPLOAD_REQUESTS_TABLE)
             ->select(['id'])
             ->where('applicant_id', $applicantId)
@@ -146,15 +155,21 @@ class AssessmentUploadAccess
             ->first();
     }
 
-    private function hostMatchesApplicantBrand(string $host, object $applicant): bool
+    private function brandKeyForHost(string $host): ?string
     {
-        $hostBrand = config('assessment_upload.host_brands.'.Str::lower($host));
+        $hostBrands = (array) config('assessment_upload.host_brands', []);
+        $hostBrand = $hostBrands[Str::lower($host)] ?? null;
 
         if (! is_string($hostBrand) || $hostBrand === '') {
-            return false;
+            return null;
         }
 
-        return $hostBrand === $this->brandKeyFor($applicant);
+        return $hostBrand;
+    }
+
+    private function brandMatchesApplicant(string $brandKey, object $applicant): bool
+    {
+        return $brandKey === $this->brandKeyFor($applicant);
     }
 
     private function brandKeyFor(object $applicant): string
@@ -185,8 +200,11 @@ class AssessmentUploadAccess
         return preg_replace('/\D+/', '', (string) $applicant->phone) ?? '';
     }
 
-    private function connection(): ConnectionInterface
+    private function connection(string $brandKey): ConnectionInterface
     {
-        return DB::connection((string) config('assessment_upload.connection', 'tms'));
+        $connections = (array) config('assessment_upload.brand_connections', []);
+        $connection = $connections[$brandKey] ?? config('assessment_upload.connection', 'tms');
+
+        return DB::connection((string) $connection);
     }
 }
