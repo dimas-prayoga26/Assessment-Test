@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Support\AssessmentUploadAccess;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Mockery;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class AssessmentUploadLinkAccessTest extends TestCase
@@ -82,23 +82,11 @@ class AssessmentUploadLinkAccessTest extends TestCase
 
         $uploadRequestQuery->shouldReceive('select')
             ->once()
-            ->with(['id'])
+            ->with(['id', 'used_at', 'revoked_at', 'expires_at'])
             ->andReturnSelf();
         $uploadRequestQuery->shouldReceive('where')
             ->once()
             ->with('applicant_id', self::APPLICANT_ID)
-            ->andReturnSelf();
-        $uploadRequestQuery->shouldReceive('whereNull')
-            ->once()
-            ->with('used_at')
-            ->andReturnSelf();
-        $uploadRequestQuery->shouldReceive('whereNull')
-            ->once()
-            ->with('revoked_at')
-            ->andReturnSelf();
-        $uploadRequestQuery->shouldReceive('where')
-            ->once()
-            ->with('expires_at', '>', Mockery::type(Carbon::class))
             ->andReturnSelf();
         $uploadRequestQuery->shouldReceive('latest')
             ->once()
@@ -106,7 +94,12 @@ class AssessmentUploadLinkAccessTest extends TestCase
             ->andReturnSelf();
         $uploadRequestQuery->shouldReceive('first')
             ->once()
-            ->andReturn((object) ['id' => 'request-id']);
+            ->andReturn((object) [
+                'id' => 'request-id',
+                'used_at' => null,
+                'revoked_at' => null,
+                'expires_at' => now()->addHour(),
+            ]);
 
         $request = Request::create(
             '/'.self::APPLICANT_ID.'/upload-file',
@@ -115,6 +108,87 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $applicant = (new AssessmentUploadAccess)->applicantForRequest(self::APPLICANT_ID, $request);
 
         $this->assertSame('TRAH Applicant', $applicant->full_name);
+    }
+
+    public function test_revoked_applicant_upload_request_is_rejected(): void
+    {
+        config([
+            'assessment_upload.connection' => 'assessment',
+            'assessment_upload.host_brands' => [
+                'technical-test.trah.co.id' => 'trah',
+            ],
+        ]);
+
+        $connection = Mockery::mock(ConnectionInterface::class);
+        $applicantQuery = Mockery::mock();
+        $uploadRequestQuery = Mockery::mock();
+
+        DB::shouldReceive('connection')
+            ->twice()
+            ->with('assessment')
+            ->andReturn($connection);
+
+        $connection->shouldReceive('table')
+            ->once()
+            ->with('applicants')
+            ->andReturn($applicantQuery);
+
+        $applicantQuery->shouldReceive('select')
+            ->once()
+            ->with(['id', 'full_name', 'email', 'phone', 'brand_key'])
+            ->andReturnSelf();
+        $applicantQuery->shouldReceive('where')
+            ->once()
+            ->with('id', self::APPLICANT_ID)
+            ->andReturnSelf();
+        $applicantQuery->shouldReceive('whereNull')
+            ->once()
+            ->with('deleted_at')
+            ->andReturnSelf();
+        $applicantQuery->shouldReceive('first')
+            ->once()
+            ->andReturn((object) [
+                'id' => self::APPLICANT_ID,
+                'full_name' => 'TRAH Applicant',
+                'email' => 'candidate@example.test',
+                'phone' => '081234567890',
+                'brand_key' => 'trah',
+            ]);
+
+        $connection->shouldReceive('table')
+            ->once()
+            ->with('applicant_upload_requests')
+            ->andReturn($uploadRequestQuery);
+
+        $uploadRequestQuery->shouldReceive('select')
+            ->once()
+            ->with(['id', 'used_at', 'revoked_at', 'expires_at'])
+            ->andReturnSelf();
+        $uploadRequestQuery->shouldReceive('where')
+            ->once()
+            ->with('applicant_id', self::APPLICANT_ID)
+            ->andReturnSelf();
+        $uploadRequestQuery->shouldReceive('latest')
+            ->once()
+            ->with('created_at')
+            ->andReturnSelf();
+        $uploadRequestQuery->shouldReceive('first')
+            ->once()
+            ->andReturn((object) [
+                'id' => 'request-id',
+                'used_at' => null,
+                'revoked_at' => now(),
+                'expires_at' => now()->addHour(),
+            ]);
+
+        $request = Request::create(
+            '/'.self::APPLICANT_ID.'/upload-file',
+            server: ['HTTP_HOST' => 'technical-test.trah.co.id'],
+        );
+
+        $this->expectException(NotFoundHttpException::class);
+
+        (new AssessmentUploadAccess)->applicantForRequest(self::APPLICANT_ID, $request);
     }
 
     public function test_generated_applicant_upload_routes_and_brand_guard_are_registered(): void
@@ -145,6 +219,8 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringContainsString('brandKeyForHost', $access);
         $this->assertStringContainsString("config('assessment_upload.connection'", $access);
         $this->assertStringContainsString("config('assessment_upload.host_brands', [])", $access);
+        $this->assertStringContainsString("'revoked_at'", $access);
+        $this->assertStringContainsString('$uploadRequest->revoked_at === null', $access);
         $this->assertStringContainsString("'connection' => env('ASSESSMENT_UPLOAD_DB_CONNECTION', env('DB_CONNECTION', 'mysql'))", $assessmentConfig);
         $this->assertStringNotContainsString("'assessment_upload' => [", $databaseConfig);
         $this->assertStringContainsString('storeAssessmentDocument', $access);

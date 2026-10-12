@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -184,15 +185,27 @@ class AssessmentUploadAccess
 
     private function activeUploadRequest(string $applicantId): ?object
     {
-        return $this->connection()
+        $uploadRequest = $this->connection()
             ->table(self::UPLOAD_REQUESTS_TABLE)
-            ->select(['id'])
+            ->select(['id', 'used_at', 'revoked_at', 'expires_at'])
             ->where('applicant_id', $applicantId)
-            ->whereNull('used_at')
-            ->whereNull('revoked_at')
-            ->where('expires_at', '>', now())
             ->latest('created_at')
             ->first();
+
+        if (! $this->isUploadRequestActive($uploadRequest)) {
+            return null;
+        }
+
+        return $uploadRequest;
+    }
+
+    private function isUploadRequestActive(?object $uploadRequest): bool
+    {
+        return $uploadRequest !== null
+            && $uploadRequest->used_at === null
+            && $uploadRequest->revoked_at === null
+            && $uploadRequest->expires_at !== null
+            && Carbon::parse($uploadRequest->expires_at)->isFuture();
     }
 
     private function brandKeyForHost(string $host): ?string
