@@ -8,7 +8,7 @@ class ErrorPageTest extends TestCase
 {
     public function test_root_domain_returns_custom_not_found_page(): void
     {
-        $response = $this->get('http://technical-test.trah.co.id/');
+        $response = $this->get('http://assessment-test.trah.co.id/');
 
         $response
             ->assertNotFound()

@@ -29,13 +29,31 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertSame('0812 3456 ****', $access->maskedPhone($applicant));
     }
 
+    public function test_only_assessment_test_hosts_resolve_to_a_brand(): void
+    {
+        $hostBrands = config('assessment_upload.host_brands');
+        $brandDomains = [
+            'rnb.co.id' => 'rnb',
+            'trah.co.id' => 'trah',
+            'karpetmerah.id' => 'kma',
+            'rne.co.id' => 'rne',
+            'coffeeniskala.com' => 'niskala',
+            'tims.co.id' => 'tms',
+        ];
+
+        foreach ($brandDomains as $domain => $brandKey) {
+            $this->assertSame($brandKey, $hostBrands['assessment-test.'.$domain] ?? null);
+            $this->assertArrayNotHasKey('technical-test.'.$domain, $hostBrands);
+        }
+    }
+
     public function test_applicant_lookup_uses_configured_connection_for_request_domain(): void
     {
         config([
             'assessment_upload.connection' => 'assessment',
             'assessment_upload.host_brands' => [
-                'technical-test.rnb.co.id' => 'rnb',
-                'technical-test.trah.co.id' => 'trah',
+                'assessment-test.rnb.co.id' => 'rnb',
+                'assessment-test.trah.co.id' => 'trah',
             ],
         ]);
 
@@ -103,7 +121,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
 
         $request = Request::create(
             '/'.self::APPLICANT_ID.'/upload-file',
-            server: ['HTTP_HOST' => 'technical-test.trah.co.id'],
+            server: ['HTTP_HOST' => 'assessment-test.trah.co.id'],
         );
         $applicant = (new AssessmentUploadAccess)->applicantForRequest(self::APPLICANT_ID, $request);
 
@@ -115,7 +133,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
         config([
             'assessment_upload.connection' => 'assessment',
             'assessment_upload.host_brands' => [
-                'technical-test.trah.co.id' => 'trah',
+                'assessment-test.trah.co.id' => 'trah',
             ],
         ]);
 
@@ -183,7 +201,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
 
         $request = Request::create(
             '/'.self::APPLICANT_ID.'/upload-file',
-            server: ['HTTP_HOST' => 'technical-test.trah.co.id'],
+            server: ['HTTP_HOST' => 'assessment-test.trah.co.id'],
         );
 
         $this->expectException(NotFoundHttpException::class);
@@ -263,7 +281,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringContainsString('/upload-file/verify-applicant', $andalanService);
         $this->assertStringContainsString('/assessment-file', $andalanService);
         $this->assertStringContainsString("public const TYPE_ASSESSMENT_TEST = 'assessment_test';", $andalanDocumentModel);
-        $this->assertStringContainsString("'trah' => 'https://technical-test.trah.co.id'", $andalanAssessmentConfig);
+        $this->assertStringContainsString("'trah' => 'https://assessment-test.trah.co.id'", $andalanAssessmentConfig);
         $this->assertStringContainsString('assessmentFileUrl', $andalanAssessmentView);
     }
 }

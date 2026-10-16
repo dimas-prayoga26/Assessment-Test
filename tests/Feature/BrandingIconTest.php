@@ -14,12 +14,26 @@ class BrandingIconTest extends TestCase
         $this->mockVerifiedApplicantAccess();
 
         $response = $this
-            ->withHeader('Host', 'technical-test.rnb.co.id')
-            ->get('http://technical-test.rnb.co.id/'.self::APPLICANT_ID.'/upload-file/verify-applicant');
+            ->withHeader('Host', 'assessment-test.rnb.co.id')
+            ->get('http://assessment-test.rnb.co.id/'.self::APPLICANT_ID.'/upload-file/verify-applicant');
 
         $response
             ->assertOk()
             ->assertSee('images/Logo%20RNB.png', false);
+    }
+
+    public function test_branding_icon_does_not_brand_technical_test_host(): void
+    {
+        $this->mockVerifiedApplicantAccess();
+
+        $response = $this
+            ->withHeader('Host', 'technical-test.tims.co.id')
+            ->get('http://technical-test.tims.co.id/'.self::APPLICANT_ID.'/upload-file/verify-applicant');
+
+        $response
+            ->assertOk()
+            ->assertSee('images/images.png', false)
+            ->assertDontSee('images/Logo%20TMS.png', false);
     }
 
     public function test_branding_icon_uses_default_logo_for_unknown_host(): void

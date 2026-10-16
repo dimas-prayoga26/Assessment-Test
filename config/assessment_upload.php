@@ -12,11 +12,11 @@ return [
     'storage_directory' => 'uploaded-images',
 
     'host_brands' => [
-        'technical-test.rnb.co.id' => 'rnb',
-        'technical-test.trah.co.id' => 'trah',
-        'technical-test.karpetmerah.id' => 'kma',
-        'technical-test.rne.co.id' => 'rne',
-        'technical-test.coffeeniskala.com' => 'niskala',
-        'technical-test.tims.co.id' => 'tms',
+        'assessment-test.rnb.co.id' => 'rnb',
+        'assessment-test.trah.co.id' => 'trah',
+        'assessment-test.karpetmerah.id' => 'kma',
+        'assessment-test.rne.co.id' => 'rne',
+        'assessment-test.coffeeniskala.com' => 'niskala',
+        'assessment-test.tims.co.id' => 'tms',
     ],
 ];
