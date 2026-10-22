@@ -59,16 +59,16 @@ class UploadFileController extends Controller
             'document' => [
                 'required',
                 'file',
-                'mimes:pdf,docx',
-                'extensions:pdf,docx',
+                'mimes:pdf,docx,jpg,jpeg,png,webp,zip,rar',
+                'extensions:pdf,docx,jpg,jpeg,png,webp,zip,rar',
                 'max:5120',
                 new SafeAssessmentDocument,
             ],
         ], [
             'document.required' => 'Please upload your assessment document.',
             'document.file' => 'Please upload a valid assessment document.',
-            'document.mimes' => 'The document must be a PDF or DOCX file.',
-            'document.extensions' => 'The document file name must end in .pdf or .docx.',
+            'document.mimes' => 'The document must be a PDF, DOCX, JPG, PNG, WEBP, ZIP, or RAR file.',
+            'document.extensions' => 'The document file name must end in .pdf, .docx, .jpg, .jpeg, .png, .webp, .zip, or .rar.',
             'document.max' => 'The document may not be greater than 5 MB.',
         ]);
 

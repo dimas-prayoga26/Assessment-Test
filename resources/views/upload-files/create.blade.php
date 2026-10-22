@@ -154,7 +154,7 @@
     <main class="upload-shell">
         <section class="upload-panel" aria-labelledby="upload-title">
             <h1 id="upload-title" class="upload-title">Upload Assessment Document</h1>
-            <p class="upload-copy">Upload a PDF or DOCX document. Maximum file size is 5 MB.</p>
+            <p class="upload-copy">Upload a PDF or DOCX document, an image (JPG, PNG, or WEBP), or a ZIP or RAR archive. Maximum file size is 5 MB.</p>
 
             @if (session('status'))
                 <span class="upload-status">
@@ -170,7 +170,7 @@
 
                 <div id="document-dropzone" class="dropzone upload-dropzone">
                     <label for="document" class="upload-dropzone-content">
-                        <input id="document" class="upload-input" name="document" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                        <input id="document" class="upload-input" name="document" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png,.webp,.zip,.rar,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp,application/zip,application/x-zip-compressed,application/vnd.rar,application/x-rar-compressed">
                         <svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <path d="M27.1666 26.6667L20.4999 20L13.8333 26.6667" stroke="#DADADA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             <path d="M20.5 20V35" stroke="#DADADA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -178,7 +178,7 @@
                             <path d="M27.1666 26.6667L20.4999 20L13.8333 26.6667" stroke="#DADADA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
                         <span id="document-file-name" class="upload-file-name">Choose or drag your document here</span>
-                        <span class="upload-hint">PDF and DOCX only.</span>
+                        <span class="upload-hint">PDF, DOCX, JPG, PNG, WEBP, ZIP, and RAR only.</span>
                     </label>
                 </div>
 
