@@ -95,7 +95,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
 
         $connection->shouldReceive('table')
             ->once()
-            ->with('applicant_upload_requests')
+            ->with('applicant_assessment_test_upload_requests')
             ->andReturn($uploadRequestQuery);
 
         $uploadRequestQuery->shouldReceive('select')
@@ -175,7 +175,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
 
         $connection->shouldReceive('table')
             ->once()
-            ->with('applicant_upload_requests')
+            ->with('applicant_assessment_test_upload_requests')
             ->andReturn($uploadRequestQuery);
 
         $uploadRequestQuery->shouldReceive('select')
@@ -243,7 +243,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $this->assertStringNotContainsString("'assessment_upload' => [", $databaseConfig);
         $this->assertStringContainsString('storeAssessmentDocument', $access);
         $this->assertStringContainsString('assessmentDocumentForRequest', $access);
-        $this->assertStringContainsString('applicant_upload_requests', $access);
+        $this->assertStringContainsString('applicant_assessment_test_upload_requests', $access);
         $this->assertStringContainsString('applicant_documents', $access);
         $this->assertStringContainsString('AssessmentUploadAccess', $verificationController);
         $this->assertStringContainsString('AssessmentUploadAccess', $uploadController);
@@ -269,7 +269,7 @@ class AssessmentUploadLinkAccessTest extends TestCase
         $access = File::get(app_path('Support/AssessmentUploadAccess.php'));
         $andalanService = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'Services'.DIRECTORY_SEPARATOR.'ApplicantAssessmentUploadLinkService.php');
         $andalanDocumentModel = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'Models'.DIRECTORY_SEPARATOR.'ApplicantDocument.php');
-        $andalanAssessmentConfig = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'assessment_upload.php');
+        $andalanAssessmentConfig = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'assessment_test_upload.php');
         $andalanAssessmentView = File::get($andalanProjectPath.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.'applicant_data'.DIRECTORY_SEPARATOR.'assessment.blade.php');
 
         $this->assertStringContainsString('/{applicant}/upload-file/verify-applicant', $routes);

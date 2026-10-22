@@ -13,7 +13,7 @@ class AssessmentUploadAccess
 {
     private const APPLICANTS_TABLE = 'applicants';
 
-    private const UPLOAD_REQUESTS_TABLE = 'applicant_upload_requests';
+    private const UPLOAD_REQUESTS_TABLE = 'applicant_assessment_test_upload_requests';
 
     private const DOCUMENTS_TABLE = 'applicant_documents';
 
